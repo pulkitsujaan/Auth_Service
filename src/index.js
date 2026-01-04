@@ -3,7 +3,7 @@ const {PORT} = require('./config/serverConfig');
 const apiRoutes = require('./routes/index');
 const bodyParser = require('body-parser');
 
-const UserService = require('./services/user-service')
+const {User, Role} = require('./models/index')
 
 const app = express();
 
@@ -15,18 +15,17 @@ const prepareAndStartServer = ()=>{
 
     app.listen(3001, async()=>{
         console.log(`Server Started at port: ${PORT}`);
-
-        const service = new UserService();
-        // const newToken = service.createToken({email:'pulkit@admin.com', id:1});
-        // console.log(newToken);
+        if(process.env.DB_SYNC){
+            db.sequelize.sync({alter:true});
+        }
+        const u1 = await User.findByPk(3);
+        const r1 = await Role.findByPk(1);
+        // u1.addRole(r1);
         
-        // const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InB1bGtpdEBhZG1pbi5jb20iLCJpZCI6MSwiaWF0IjoxNzY3NDYzNzk2LCJleHAiOjE3Njc0NjczOTZ9.doS-OXEjbzjfZRZutSc-K_AUr7RuB-Udj_hJLwmvDcQ';
-        // const response = service.verifyToken(token);
-        // console.log(response);
-
-        
-
+          
     })
+
+    
 }
 
 prepareAndStartServer();
