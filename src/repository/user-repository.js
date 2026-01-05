@@ -1,5 +1,7 @@
 const ValidationError = require('../utils/validation-error');
 const { User, Role } = require('../models/index');
+const ClientError = require('../utils/client-error');
+const { StatusCodes } = require('http-status-codes');
 
 class UserRepository{
     async create(data){
@@ -15,11 +17,11 @@ class UserRepository{
         }
     }
 
-    async destroy(){
+    async destroy(userId){
         try {
             await User.destroy({
                 where:{
-                    id: UserId
+                    id: userId
                 }
             });
             return true;
@@ -46,10 +48,19 @@ class UserRepository{
                     email:userEmail
                 }
             });
+            console.log(user);
+            if(!user){
+                throw new ClientError(
+                    'AttributeNotFound',
+                    'Invalid email sent in the request',
+                    'Please check the email as there is no record of the email',
+                    StatusCodes.NOT_FOUND
+                );
+            }
             return user;
         } catch (error) {
             console.log("Something went wrong in the service layer");
-            throw {error};
+            throw error;
         }
     }
 
